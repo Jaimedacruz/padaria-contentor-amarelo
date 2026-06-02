@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#F5C518">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Padaria Contentor Amarelo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       PIN
+  ════════════════════════════════════════════ -->
+  <div id="screen-pin" class="screen active">
+    <div class="pin-wrap">
+      <div class="pin-logo">🍞</div>
+      <h1 class="pin-title">Padaria<br>Contentor Amarelo</h1>
+      <p class="pin-subtitle">Introduza o PIN para aceder</p>
+      <input type="password" id="pin-input" class="pin-input"
+             inputmode="numeric" pattern="[0-9]*" maxlength="8"
+             placeholder="••••" autocomplete="off"
+             onkeydown="if(event.key==='Enter')App.verifyPin()">
+      <div id="pin-error" class="pin-error"></div>
+      <button class="pin-btn" onclick="App.verifyPin()">Entrar →</button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       ECRÃ INICIAL
+  ════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen">
+    <div class="home-header">
+      <button class="close-tab-btn" onclick="window.close()" title="Fechar">✕</button>
+      <div class="home-logo">🍞</div>
+      <h1 class="home-title">Padaria<br>Contentor Amarelo</h1>
+      <p class="home-subtitle">Controlo de Stock</p>
+    </div>
+    <div class="home-grid">
+      <button class="home-btn" onclick="App.goTo('vendas',null)">
+        <span class="home-btn-icon">🛒</span>
+        <span class="home-btn-label">Vendas</span>
+      </button>
+      <button class="home-btn" onclick="App.goToShiftPick('producao')">
+        <span class="home-btn-icon">🥖</span>
+        <span class="home-btn-label">Produção</span>
+      </button>
+      <button class="home-btn home-btn--full" onclick="App.goTo('resumo',null)">
+        <span class="home-btn-icon">📊</span>
+        <span class="home-btn-label">Resumo</span>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       ESCOLHA DE TURNO
+  ════════════════════════════════════════════ -->
+  <div id="screen-shift-pick" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="App.goHome()">← Voltar</button>
+      <h2 id="shift-pick-title">Vendas</h2>
+    </div>
+    <div class="shift-pick-grid">
+      <button class="shift-pick-btn" onclick="App.goToFromShiftPick('Noite')">
+        <span class="shift-pick-icon">🌙</span>
+        <span class="shift-pick-label">Noite</span>
+      </button>
+      <button class="shift-pick-btn" onclick="App.goToFromShiftPick('Manhã')">
+        <span class="shift-pick-icon">☀️</span>
+        <span class="shift-pick-label">Manhã</span>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       VENDAS
+  ════════════════════════════════════════════ -->
+  <div id="screen-vendas" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="App.goHome()">← Voltar</button>
+      <h2>🛒 Vendas</h2>
+    </div>
+
+    <div class="form-card">
+      <div class="field-group">
+        <label class="field-label">👤 Nome do Vendedor</label>
+        <input type="text" id="vendas-nome" class="big-input" placeholder="Nome do vendedor..." autocomplete="name">
+      </div>
+      <div class="field-group">
+        <label class="field-label">📅 Data</label>
+        <input type="date" id="vendas-data" class="big-input">
+      </div>
+    </div>
+
+    <div class="products-section">
+      <div class="products-section-title">🥖 Produtos</div>
+      <div id="vendas-produtos"></div>
+    </div>
+
+    <div class="saidas-section">
+      <div class="saidas-header">
+        <span class="products-section-title" style="padding-bottom:0">💸 Saídas</span>
+        <button class="add-saida-btn" onclick="App.addSaida()">+ Adicionar</button>
+      </div>
+      <div id="saidas-list"></div>
+    </div>
+
+    <div class="totals-panel">
+      <div class="totals-panel-title">📊 Totais</div>
+      <div class="total-row">
+        <span class="total-row-label">🌙 Total Noite</span>
+        <span class="total-row-value" id="tot-noite">0 MT</span>
+      </div>
+      <div class="total-row">
+        <span class="total-row-label">☀️ Total Manhã</span>
+        <span class="total-row-value" id="tot-manha">0 MT</span>
+      </div>
+      <div class="total-row" style="border-top:2px solid var(--yellow)">
+        <span class="total-row-label" style="font-weight:800">Total Geral</span>
+        <span class="total-row-value" id="tot-geral">0 MT</span>
+      </div>
+      <div class="total-row">
+        <span class="total-row-label">💸 Saídas</span>
+        <span class="total-row-value" id="tot-saidas" style="color:var(--red)">− 0 MT</span>
+      </div>
+      <div class="total-row" style="background:var(--yellow-light)">
+        <span class="total-row-label" style="font-weight:800">Net a Entregar</span>
+        <span class="total-row-value" id="tot-net-entregar">0 MT</span>
+      </div>
+      <div class="total-row money-received-row">
+        <span class="total-row-label">💵 Dinheiro Recebido</span>
+        <div class="money-input-wrap">
+          <input type="number" id="dinheiro-recebido" class="money-input"
+                 placeholder="0" min="0" inputmode="decimal" oninput="App.calcVendasTotals()">
+          <span class="money-label">MT</span>
+        </div>
+      </div>
+      <div id="status-banner" class="status-banner status-banner--inline"></div>
+      <div class="distribuicao-header">💰 Distribuição do Dinheiro</div>
+      <div class="total-row money-received-row">
+        <span class="total-row-label">🏦 Depositado</span>
+        <div class="money-input-wrap">
+          <input type="number" id="dinheiro-depositado" class="money-input"
+                 placeholder="0" min="0" inputmode="decimal" oninput="App.calcVendasTotals()">
+          <span class="money-label">MT</span>
+        </div>
+      </div>
+      <div class="total-row money-received-row">
+        <span class="total-row-label">🔒 No Cofre</span>
+        <div class="money-input-wrap">
+          <input type="number" id="dinheiro-cofre" class="money-input"
+                 placeholder="0" min="0" inputmode="decimal" oninput="App.calcVendasTotals()">
+          <span class="money-label">MT</span>
+        </div>
+      </div>
+      <div class="total-row distribuicao-check-row" id="distribuicao-check-row">
+        <span class="total-row-label" id="distribuicao-check-label">Depositado + Cofre</span>
+        <span class="total-row-value" id="tot-distribuicao">0 MT</span>
+      </div>
+    </div>
+
+    <div class="form-card" style="margin-top:14px">
+      <div class="field-group" style="margin-bottom:0">
+        <label class="field-label">💬 Comentários</label>
+        <textarea id="vendas-comentario" class="big-input" rows="3"
+          placeholder="Alguma observação? (opcional)"
+          style="resize:vertical;min-height:80px;font-size:15px;line-height:1.5"></textarea>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="vendas-submit-btn" onclick="App.showConfirm()">
+      ✅ Submeter
+    </button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       PRODUÇÃO
+  ════════════════════════════════════════════ -->
+  <div id="screen-producao" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="App.goToShiftPick('producao')">← Voltar</button>
+      <h2 id="prod-title">Produção — Noite</h2>
+    </div>
+
+    <div class="form-card">
+      <div class="field-group">
+        <label class="field-label">👤 Nome do Trabalhador</label>
+        <input type="text" id="prod-nome" class="big-input" placeholder="Nome do trabalhador..." autocomplete="name">
+      </div>
+      <div class="field-group">
+        <label class="field-label">📅 Data</label>
+        <input type="date" id="prod-data" class="big-input">
+      </div>
+    </div>
+
+    <div class="products-section">
+      <div class="products-section-title">🥖 Produtos</div>
+      <div id="prod-produtos"></div>
+    </div>
+
+    <div class="totals-panel">
+      <div class="totals-panel-title">📊 Totais</div>
+      <div class="total-row">
+        <span class="total-row-label">Total Produzido</span>
+        <span class="total-row-value" id="tot-produzido">0 un.</span>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="prod-submit-btn" onclick="App.submitProducao()">
+      ✅ Submeter
+    </button>
+  </div>
+
+
+
+
+  <!-- ═══════════════════════════════════════════
+       RESUMO
+  ════════════════════════════════════════════ -->
+  <div id="screen-resumo" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="App.goHome()">← Voltar</button>
+      <h2>📊 Resumo</h2>
+    </div>
+    <div id="resumo-content"></div>
+    <button class="resumo-clear-btn" onclick="App.clearResumo()">🗑 Limpar registos locais</button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       CONFIRMAR SUBMISSÃO
+  ════════════════════════════════════════════ -->
+  <div id="screen-confirm" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="App.backToVendas()">← Corrigir</button>
+      <h2>📋 Confirmar</h2>
+    </div>
+    <div id="confirm-content"></div>
+    <button class="submit-btn" id="confirm-submit-btn" onclick="App.confirmAndSubmit()">
+      ✅ Confirmar e Enviar
+    </button>
+  </div>
+
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
