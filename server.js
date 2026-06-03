@@ -17,6 +17,7 @@ app.post('/api/verify-pin', (req, res) => {
     vendas:   (process.env.VENDAS_PINS || '').split(',').map(s => s.trim()).filter(Boolean),
     producao: (process.env.PROD_PINS   || '').split(',').map(s => s.trim()).filter(Boolean),
     resumo:   (process.env.RESUMO_PINS || '').split(',').map(s => s.trim()).filter(Boolean),
+    admin:    (process.env.ADMIN_PINS  || '').split(',').map(s => s.trim()).filter(Boolean),
   };
 
   const anyConfigured = Object.values(lists).some(l => l.length > 0);

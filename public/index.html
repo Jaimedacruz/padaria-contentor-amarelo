@@ -258,6 +258,28 @@
 
 
   <!-- ═══════════════════════════════════════════
+       ADMIN
+  ════════════════════════════════════════════ -->
+  <div id="screen-admin" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="App.logout()">← Sair</button>
+      <h2>⚙️ Admin</h2>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab admin-tab--active" onclick="App.switchAdminTab('resumo', this)">📊 Resumo</button>
+      <button class="admin-tab" onclick="App.switchAdminTab('stock', this)">📦 Stock</button>
+    </div>
+    <div id="admin-tab-resumo" class="admin-tab-panel admin-tab-panel--active">
+      <div id="admin-resumo-content"></div>
+      <button class="resumo-clear-btn" onclick="App.clearResumo()">🗑 Limpar registos locais</button>
+    </div>
+    <div id="admin-tab-stock" class="admin-tab-panel">
+      <div id="admin-stock-content"></div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
        CONFIRMAR SUBMISSÃO
   ════════════════════════════════════════════ -->
   <div id="screen-confirm" class="screen">

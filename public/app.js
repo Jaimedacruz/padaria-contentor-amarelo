@@ -1191,9 +1191,140 @@ const App = (() => {
       goToShiftPick('producao');
     } else if (role === 'resumo') {
       goTo('resumo', null);
+    } else if (role === 'admin') {
+      _renderAdminResumo();
+      _renderStock();
+      _showScreen('screen-admin');
     } else {
       goTo('vendas', null); // 'vendas' or any unrecognised role
     }
+  }
+
+  // ─── Admin ────────────────────────────────────────────────────
+
+  function switchAdminTab(tab, btn) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('admin-tab--active'));
+    document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('admin-tab-panel--active'));
+    btn.classList.add('admin-tab--active');
+    document.getElementById(`admin-tab-${tab}`).classList.add('admin-tab-panel--active');
+    if (tab === 'resumo') _renderAdminResumo();
+    if (tab === 'stock')  _renderStock();
+  }
+
+  function _renderAdminResumo() {
+    const container = document.getElementById('admin-resumo-content');
+    if (!container) return;
+    const reports = _loadLocal();
+    container.innerHTML = '';
+    if (reports.length === 0) {
+      container.innerHTML = '<div class="resumo-empty">📭 Nenhum registo encontrado</div>';
+      return;
+    }
+    const vendas = reports.filter(r => r.reportType === 'vendas');
+    const prod   = reports.filter(r => r.reportType === 'producao');
+    container.appendChild(_rSection('📊 Resumo Geral',        _rSummary(vendas, prod)));
+    container.appendChild(_rSection('🔍 Análise por Produto', _rProducts(vendas, prod)));
+    if (vendas.length > 0)
+      container.appendChild(_rSection('💰 Análise por Vendedor', _rFinancial(vendas)));
+    if (prod.length > 0)
+      container.appendChild(_rSection('🧂 Ingredientes Usados',  _rIngredients(prod)));
+    container.appendChild(_rSection('📋 Todos os Registos',   _rAllRecords(reports)));
+  }
+
+  // ─── Stock ────────────────────────────────────────────────────
+
+  const STOCK_KEY = 'padaria_stock_v1';
+
+  function _getStockItems() {
+    const seen = new Set();
+    const list = [];
+    Object.values(INGREDIENTS).forEach(ings => {
+      ings.forEach(ing => {
+        const key = `${ing.name}||${ing.unit}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          list.push({ name: ing.name, unit: ing.unit, key });
+        }
+      });
+    });
+    return list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  function _loadStock() {
+    try { return JSON.parse(localStorage.getItem(STOCK_KEY) || '{}'); } catch { return {}; }
+  }
+
+  function _saveStockData(data) {
+    try { localStorage.setItem(STOCK_KEY, JSON.stringify(data)); } catch {}
+  }
+
+  function _renderStock() {
+    const container = document.getElementById('admin-stock-content');
+    if (!container) return;
+
+    const items   = _getStockItems();
+    const stock   = _loadStock();
+    const reports = _loadLocal();
+    const prod    = reports.filter(r => r.reportType === 'producao');
+
+    // aggregate ingredient usage from production records
+    const usedMap = {};
+    prod.forEach(r => {
+      (r.items || []).forEach(item => {
+        (item.ingredientes || []).forEach(ing => {
+          const key = `${ing.nome}||${ing.unidade}`;
+          usedMap[key] = (usedMap[key] || 0) + ing.quantidade;
+        });
+      });
+    });
+
+    const lastSaved = Object.values(stock).reduce((latest, v) => {
+      if (!v.savedAt) return latest;
+      return (!latest || v.savedAt > latest) ? v.savedAt : latest;
+    }, null);
+
+    const lastSavedStr = lastSaved
+      ? new Date(lastSaved).toLocaleString('pt-PT')
+      : 'Nunca guardado';
+
+    container.innerHTML = `
+      <div class="stock-meta">🕐 Última atualização: <strong>${lastSavedStr}</strong></div>
+      <div class="stock-list">
+        ${items.map(item => {
+          const saved = stock[item.key];
+          const qty   = saved?.qty != null ? saved.qty : '';
+          const used  = usedMap[item.key] || 0;
+          return `
+            <div class="stock-row">
+              <div class="stock-info">
+                <span class="stock-name">${_esc(item.name)}</span>
+                ${used > 0 ? `<span class="stock-used">Usado: ${_fmt(used)} ${_esc(item.unit)}</span>` : ''}
+              </div>
+              <div class="stock-input-wrap">
+                <input type="number" class="stock-qty-input"
+                       data-key="${_esc(item.key)}"
+                       value="${qty}" placeholder="0"
+                       min="0" step="0.01" inputmode="decimal">
+                <span class="stock-unit">${_esc(item.unit)}</span>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+      <button class="stock-save-btn" onclick="App.saveStock()">💾 Guardar Stock</button>
+    `;
+  }
+
+  function saveStock() {
+    const existing = _loadStock();
+    const now = new Date().toISOString();
+    document.querySelectorAll('.stock-qty-input').forEach(input => {
+      const key = input.dataset.key;
+      const val = parseFloat(input.value);
+      if (key) existing[key] = { qty: isNaN(val) ? null : val, savedAt: now };
+    });
+    _saveStockData(existing);
+    showToast('✅ Stock guardado!');
+    _renderStock();
   }
 
   function logout() {
@@ -1280,6 +1411,8 @@ const App = (() => {
     backToVendas,
     verifyPin,
     togglePinVisibility,
+    switchAdminTab,
+    saveStock,
     logout,
   };
 })();
