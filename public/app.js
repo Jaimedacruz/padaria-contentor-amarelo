@@ -574,7 +574,7 @@ const App = (() => {
       if (result.success) {
         _saveLocal(payload);
         showToast('✅ Submetido com sucesso!');
-        setTimeout(goHome, 1600);
+        setTimeout(logout, 1600);
       } else {
         showToast('❌ Erro ao enviar. Tente outra vez.');
         if (btn) { btn.disabled = false; btn.textContent = '✅ Submeter'; }
@@ -1106,6 +1106,27 @@ const App = (() => {
 
   // ─── PIN ──────────────────────────────────────────────────────
 
+  function _goToRoleScreen(role) {
+    if (role === 'producao') {
+      goToShiftPick('producao');
+    } else if (role === 'resumo') {
+      goTo('resumo', null);
+    } else {
+      goTo('vendas', null); // 'vendas' or any unrecognised role
+    }
+  }
+
+  function logout() {
+    sessionStorage.removeItem('padaria_auth');
+    sessionStorage.removeItem('padaria_role');
+    const input = document.getElementById('pin-input');
+    if (input) input.value = '';
+    const errEl = document.getElementById('pin-error');
+    if (errEl) errEl.textContent = '';
+    _showScreen('screen-pin');
+    document.getElementById('pin-input')?.focus();
+  }
+
   async function verifyPin() {
     const input = document.getElementById('pin-input');
     const errEl = document.getElementById('pin-error');
@@ -1121,7 +1142,8 @@ const App = (() => {
       const data = await res.json();
       if (data.ok) {
         sessionStorage.setItem('padaria_auth', '1');
-        _showScreen('screen-home');
+        sessionStorage.setItem('padaria_role', data.role || 'vendas');
+        _goToRoleScreen(data.role);
       } else {
         errEl.textContent = '❌ PIN incorreto. Tente novamente.';
         input.value = '';
@@ -1140,7 +1162,8 @@ const App = (() => {
     document.getElementById('prod-data').value   = today;
 
     if (sessionStorage.getItem('padaria_auth') === '1') {
-      _showScreen('screen-home');
+      const role = sessionStorage.getItem('padaria_role') || 'vendas';
+      _goToRoleScreen(role);
     } else {
       document.getElementById('pin-input')?.focus();
     }
@@ -1167,5 +1190,6 @@ const App = (() => {
     confirmAndSubmit,
     backToVendas,
     verifyPin,
+    logout,
   };
 })();
