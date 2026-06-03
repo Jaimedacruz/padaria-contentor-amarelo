@@ -724,12 +724,14 @@ input[type="number"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  min-width: 0;
 }
 
 .encomenda-field {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .encomenda-field-lbl {
@@ -745,6 +747,7 @@ input[type="number"] {
   display: flex;
   align-items: center;
   gap: 5px;
+  min-width: 0;
 }
 
 .encomenda-qty,
