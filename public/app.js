@@ -111,25 +111,25 @@ const App = (() => {
         </div>
         <div class="tg">
           <div class="tg-empty"></div>
-          <div class="tg-head tg-manha">☀️ Manhã</div>
           <div class="tg-head tg-noite">🌙 Noite</div>
+          <div class="tg-head tg-manha">☀️ Manhã</div>
 
           <div class="tg-lbl">Recebido</div>
-          ${_tqty(`vm-v-${i}`)}
           ${_tqty(`vn-v-${i}`)}
+          ${_tqty(`vm-v-${i}`)}
 
           <div class="tg-lbl">Sobrou</div>
-          ${_tqty(`vm-s-${i}`)}
           ${_tqty(`vn-s-${i}`)}
+          ${_tqty(`vm-s-${i}`)}
 
           <div class="tg-lbl">Danif.</div>
-          ${_tqty(`vm-d-${i}`)}
           ${_tqty(`vn-d-${i}`)}
+          ${_tqty(`vm-d-${i}`)}
         </div>
         <div class="tg pt-turno-row">
           <div class="tg-empty"></div>
-          <div class="pt-manha" id="v-ptotal-m-${i}">☀️ 0 MT</div>
           <div class="pt-noite" id="v-ptotal-n-${i}">🌙 0 MT</div>
+          <div class="pt-manha" id="v-ptotal-m-${i}">☀️ 0 MT</div>
         </div>
         <div class="pt-geral" id="v-ptotal-${i}">Total: 0 MT</div>
       `;
