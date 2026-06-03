@@ -2020,6 +2020,34 @@ input[type="number"] {
   min-width: 28px;
 }
 
+.stock-custom-section {
+  margin: 14px 14px 0;
+}
+
+.stock-custom-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.stock-custom-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--black);
+}
+
+#custom-stock-list .custom-stock-row {
+  background: var(--white);
+  border: 1px solid var(--grey);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .stock-save-btn {
   display: block;
   width: calc(100% - 28px);

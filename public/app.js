@@ -1310,21 +1310,107 @@ const App = (() => {
             </div>`;
         }).join('')}
       </div>
+
+      <div class="stock-custom-section">
+        <div class="stock-custom-header">
+          <span class="stock-custom-title">➕ Outros Ingredientes</span>
+          <button class="add-encomenda-btn" onclick="App.addCustomStock()">+ Adicionar</button>
+        </div>
+        <div id="custom-stock-list"></div>
+      </div>
+
       <button class="stock-save-btn" onclick="App.saveStock()">💾 Guardar Stock</button>
     `;
+
+    // populate saved custom items
+    const customList  = document.getElementById('custom-stock-list');
+    const savedCustom = _loadCustomStock();
+    savedCustom.forEach(item => _appendCustomRow(customList, item));
   }
 
   function saveStock() {
     const existing = _loadStock();
     const now = new Date().toISOString();
-    document.querySelectorAll('.stock-qty-input').forEach(input => {
+
+    // predefined items
+    document.querySelectorAll('.stock-qty-input[data-key]').forEach(input => {
       const key = input.dataset.key;
       const val = parseFloat(input.value);
       if (key) existing[key] = { qty: isNaN(val) ? null : val, savedAt: now };
     });
     _saveStockData(existing);
+
+    // custom items
+    const customItems = [];
+    document.querySelectorAll('#custom-stock-list .custom-stock-row').forEach(row => {
+      const name = row.querySelector('.custom-stock-name')?.value.trim() || '';
+      const unit = row.querySelector('.custom-stock-unit')?.value.trim() || '';
+      const val  = parseFloat(row.querySelector('.custom-stock-qty')?.value);
+      if (name) customItems.push({ name, unit, qty: isNaN(val) ? null : val, savedAt: now });
+    });
+    _saveCustomStock(customItems);
+
     showToast('✅ Stock guardado!');
     _renderStock();
+  }
+
+  // ─── Custom stock items ───────────────────────────────────────
+
+  const STOCK_CUSTOM_KEY = 'padaria_stock_custom_v1';
+  let _customStockCounter = 0;
+
+  function _loadCustomStock() {
+    try { return JSON.parse(localStorage.getItem(STOCK_CUSTOM_KEY) || '[]'); } catch { return []; }
+  }
+
+  function _saveCustomStock(items) {
+    try { localStorage.setItem(STOCK_CUSTOM_KEY, JSON.stringify(items)); } catch {}
+  }
+
+  function _appendCustomRow(container, item = {}) {
+    _customStockCounter++;
+    const id  = _customStockCounter;
+    const row = document.createElement('div');
+    row.className = 'custom-stock-row';
+    row.id = `custom-stock-${id}`;
+    row.innerHTML = `
+      <div class="encomenda-top-row">
+        <input type="text" class="custom-stock-name big-input"
+               placeholder="Nome do ingrediente..." autocomplete="off"
+               value="${_esc(item.name || '')}">
+        <button class="saida-remove-btn" onclick="App.removeCustomStock(${id})">✕</button>
+      </div>
+      <div class="encomenda-bottom-row">
+        <div class="encomenda-field">
+          <span class="encomenda-field-lbl">Quantidade</span>
+          <div class="encomenda-input-row">
+            <input type="number" class="custom-stock-qty encomenda-qty"
+                   placeholder="0" min="0" step="0.01" inputmode="decimal"
+                   value="${item.qty != null ? item.qty : ''}">
+          </div>
+        </div>
+        <div class="encomenda-field">
+          <span class="encomenda-field-lbl">Unidade</span>
+          <div class="encomenda-input-row">
+            <input type="text" class="custom-stock-unit encomenda-qty"
+                   placeholder="kg / L / g…" maxlength="12" autocomplete="off"
+                   value="${_esc(item.unit || '')}">
+          </div>
+        </div>
+      </div>`;
+    container.appendChild(row);
+  }
+
+  function addCustomStock() {
+    const list = document.getElementById('custom-stock-list');
+    if (!list) return;
+    _appendCustomRow(list);
+    list.lastElementChild?.querySelector('.custom-stock-name')?.focus();
+  }
+
+  function removeCustomStock(id) {
+    const el = document.getElementById(`custom-stock-${id}`);
+    if (el) el.remove();
   }
 
   function logout() {
@@ -1413,6 +1499,8 @@ const App = (() => {
     togglePinVisibility,
     switchAdminTab,
     saveStock,
+    addCustomStock,
+    removeCustomStock,
     logout,
   };
 })();
