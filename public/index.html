@@ -19,10 +19,13 @@
       <div class="pin-logo">🍞</div>
       <h1 class="pin-title">Padaria<br>Contentor Amarelo</h1>
       <p class="pin-subtitle">Introduza o PIN para aceder</p>
-      <input type="password" id="pin-input" class="pin-input"
-             inputmode="text" maxlength="12"
-             placeholder="••••••" autocomplete="off"
-             onkeydown="if(event.key==='Enter')App.verifyPin()">
+      <div class="pin-input-wrap">
+        <input type="password" id="pin-input" class="pin-input"
+               inputmode="text" maxlength="12"
+               placeholder="••••••" autocomplete="off"
+               onkeydown="if(event.key==='Enter')App.verifyPin()">
+        <button class="pin-toggle-btn" type="button" onclick="App.togglePinVisibility(this)" tabindex="-1" aria-label="Mostrar password">👁</button>
+      </div>
       <div id="pin-error" class="pin-error"></div>
       <button class="pin-btn" onclick="App.verifyPin()">Entrar →</button>
     </div>

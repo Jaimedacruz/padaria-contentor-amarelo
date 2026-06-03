@@ -1358,16 +1358,23 @@ input[type="number"] {
   margin-bottom: 28px;
 }
 
+.pin-input-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  display: flex;
+  align-items: center;
+}
+
 .pin-input {
   width: 100%;
-  max-width: 220px;
   font-size: 28px;
   font-weight: 700;
   text-align: center;
   letter-spacing: 8px;
   border: 2px solid var(--grey);
   border-radius: var(--radius);
-  padding: 14px 16px;
+  padding: 14px 48px 14px 16px;
   background: var(--white);
   outline: none;
   transition: border-color 0.2s;
@@ -1377,6 +1384,21 @@ input[type="number"] {
   border-color: var(--yellow);
   box-shadow: 0 0 0 3px rgba(245,197,24,0.25);
 }
+
+.pin-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.pin-toggle-btn:hover { opacity: 1; }
 
 .pin-error {
   min-height: 22px;

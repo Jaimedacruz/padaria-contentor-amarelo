@@ -1127,6 +1127,13 @@ const App = (() => {
     document.getElementById('pin-input')?.focus();
   }
 
+  function togglePinVisibility(btn) {
+    const input = document.getElementById('pin-input');
+    const show  = input.type === 'password';
+    input.type  = show ? 'text' : 'password';
+    btn.textContent = show ? '🙈' : '👁';
+  }
+
   async function verifyPin() {
     const input = document.getElementById('pin-input');
     const errEl = document.getElementById('pin-error');
@@ -1190,6 +1197,7 @@ const App = (() => {
     confirmAndSubmit,
     backToVendas,
     verifyPin,
+    togglePinVisibility,
     logout,
   };
 })();
