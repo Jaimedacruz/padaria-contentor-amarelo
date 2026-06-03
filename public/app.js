@@ -777,6 +777,8 @@ const App = (() => {
     container.appendChild(_rSection('🔍 Análise por Produto',        _rProducts(vendas, prod)));
     if (vendas.length > 0)
       container.appendChild(_rSection('💰 Análise por Vendedor',     _rFinancial(vendas)));
+    if (prod.length > 0)
+      container.appendChild(_rSection('🧂 Ingredientes Usados',      _rIngredients(prod)));
     container.appendChild(_rSection('📋 Todos os Registos',          _rAllRecords(reports)));
   }
 
@@ -947,7 +949,32 @@ const App = (() => {
     }).join('');
   }
 
-  // Section 4 — all records detailed
+  // Section 4 — ingredient totals across all production
+  function _rIngredients(prod) {
+    const map = {};
+    prod.forEach(r => {
+      (r.items || []).forEach(item => {
+        (item.ingredientes || []).forEach(ing => {
+          const key = `${ing.nome}||${ing.unidade}`;
+          if (!map[key]) map[key] = { nome: ing.nome, unidade: ing.unidade, total: 0 };
+          map[key].total += ing.quantidade;
+        });
+      });
+    });
+
+    const entries = Object.values(map).sort((a, b) => a.nome.localeCompare(b.nome));
+    if (!entries.length)
+      return '<div class="resumo-empty" style="padding:16px">Sem registos de ingredientes ainda</div>';
+
+    return `<div class="ing-summary-list">${entries.map(e =>
+      `<div class="ing-summary-row">
+        <span class="ing-summary-name">${_esc(e.nome)}</span>
+        <span class="ing-summary-val"><strong>${_fmt(e.total)}</strong> ${_esc(e.unidade)}</span>
+      </div>`
+    ).join('')}</div>`;
+  }
+
+  // Section 5 — all records detailed
   function _rAllRecords(reports) {
     const groups = [
       { title: '🛒 Vendas',          fn: r => r.reportType === 'vendas'   },
@@ -965,9 +992,14 @@ const App = (() => {
 
         if (!isV) {
           const active = (r.items || []).filter(x => x.produzido > 0);
-          const rows   = active.map(x =>
-            `<div class="rec-item"><span>${_esc(x.produto)}</span><span class="rec-vals"><strong>${x.produzido}</strong> un.</span></div>`
-          ).join('');
+          const rows = active.map(x => {
+            const ingHtml = (x.ingredientes || []).length
+              ? `<div class="rec-ing-list">${x.ingredientes.map(ing =>
+                  `<span class="rec-ing-item">${_esc(ing.nome)}: <strong>${_fmt(ing.quantidade)} ${_esc(ing.unidade)}</strong></span>`
+                ).join('')}</div>`
+              : '';
+            return `<div class="rec-item"><span>${_esc(x.produto)}</span><span class="rec-vals"><strong>${x.produzido}</strong> un.</span></div>${ingHtml}`;
+          }).join('');
           return `<div class="rec-card">
             <div class="rec-header"><span class="rec-name">${_esc(nome)}</span><span class="rec-date">${r.date}</span></div>
             <div class="rec-items">${rows || '<span style="color:#bbb;font-size:13px">Sem entradas</span>'}</div>
@@ -1070,6 +1102,7 @@ const App = (() => {
   function _float(id) { return Math.max(0, parseFloat(document.getElementById(id)?.value) || 0); }
   function _setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
   function _esc(s)    { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function _fmt(n)    { return Number.isInteger(n) ? n : parseFloat(n.toFixed(2)); }
 
   // ─── PIN ──────────────────────────────────────────────────────
 

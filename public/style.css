@@ -1486,6 +1486,55 @@ input[type="number"] {
   min-width: 36px;
 }
 
+/* ─── Resumo ingredient summary ────────────────── */
+
+.ing-summary-list {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--grey);
+  overflow: hidden;
+}
+
+.ing-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--grey);
+}
+
+.ing-summary-row:last-child {
+  border-bottom: none;
+}
+
+.ing-summary-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.ing-summary-val {
+  font-size: 14px;
+  color: #555;
+}
+
+/* ─── Record ingredient tags ────────────────────── */
+
+.rec-ing-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px 12px 8px;
+}
+
+.rec-ing-item {
+  font-size: 12px;
+  background: var(--grey-light);
+  color: #555;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
 .fin-seller-body { padding: 4px 0; }
 
 .fin-dr {
