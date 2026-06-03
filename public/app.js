@@ -1445,8 +1445,30 @@ const App = (() => {
       <input type="text" class="stock-notes-input custom-stock-notes"
              placeholder="📝 Notas..."
              value="${_esc(item.notes || '')}">
+      <button class="custom-stock-add-btn" onclick="App.confirmCustomStock(${id})">✅ Adicionar ao Stock</button>
     `;
     container.appendChild(row);
+  }
+
+  function confirmCustomStock(id) {
+    const row  = document.getElementById(`custom-stock-${id}`);
+    if (!row) return;
+    const name = row.querySelector('.custom-stock-name')?.value.trim() || '';
+    if (!name) { showToast('⚠️ Preencha o nome do ingrediente'); return; }
+
+    // collect all current custom rows and save
+    const now   = new Date().toISOString();
+    const items = [];
+    document.querySelectorAll('#custom-stock-list .custom-stock-row').forEach(r => {
+      const n  = r.querySelector('.custom-stock-name')?.value.trim() || '';
+      const u  = r.querySelector('.custom-stock-unit')?.value.trim() || '';
+      const nt = r.querySelector('.custom-stock-notes')?.value.trim() || '';
+      const v  = parseFloat(r.querySelector('.custom-stock-qty')?.value);
+      if (n) items.push({ name: n, unit: u, qty: isNaN(v) ? null : v, notes: nt || null, savedAt: now });
+    });
+    _saveCustomStock(items);
+    showToast('✅ Ingrediente adicionado ao stock!');
+    _renderStock();
   }
 
   function addCustomStock() {
@@ -1549,6 +1571,7 @@ const App = (() => {
     saveStock,
     calcStockSaldo,
     addCustomStock,
+    confirmCustomStock,
     removeCustomStock,
     logout,
   };
