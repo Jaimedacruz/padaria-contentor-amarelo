@@ -259,7 +259,7 @@ const App = (() => {
       <div class="ing-row">
         <div class="ing-label-wrap">
           <span class="ing-label">${_esc(ing.name)}</span>
-          <span class="ing-hint">ref: ${ing.ref} ${_esc(ing.unit)}</span>
+          <span class="ing-hint">${ing.ref} ${_esc(ing.unit)}</span>
         </div>
         <div class="ing-input-wrap">
           <input type="number" id="p-ing-${pIdx}-${j}" class="ing-input"
