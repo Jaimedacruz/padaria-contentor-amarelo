@@ -687,6 +687,7 @@ const App = (() => {
   function removeEncomenda(id) {
     const el = document.getElementById(`encomenda-${id}`);
     if (el) el.remove();
+    calcVendasTotals();
   }
 
   // ─── Fecho de Caixa ──────────────────────────────────────────
