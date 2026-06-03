@@ -311,9 +311,15 @@ const App = (() => {
     });
 
     const totalGeral  = totalNoite + totalManha;
-    const totalSaidas = Array.from(document.querySelectorAll('.saida-amt'))
+    const totalSaidas     = Array.from(document.querySelectorAll('.saida-amt'))
       .reduce((s, el) => s + Math.max(0, parseFloat(el.value) || 0), 0);
-    const netEntregar = Math.max(0, totalGeral - totalSaidas);
+    const totalEncomendas = Array.from(document.querySelectorAll('.encomenda-amt'))
+      .reduce((s, el) => s + Math.max(0, parseFloat(el.value) || 0), 0);
+    const netEntregar     = Math.max(0, totalGeral - totalSaidas) + totalEncomendas;
+
+    const encRow = document.getElementById('tot-enc-row');
+    if (encRow) encRow.style.display = totalEncomendas > 0 ? '' : 'none';
+    _setText('tot-encomendas', `+ ${totalEncomendas} MT`);
 
     _setText('tot-noite',        `${totalNoite} MT`);
     _setText('tot-manha',        `${totalManha} MT`);
@@ -653,17 +659,25 @@ const App = (() => {
     item.className = 'encomenda-item';
     item.id = `encomenda-${id}`;
     item.innerHTML = `
-      <input type="text" class="encomenda-nome big-input" placeholder="Nome da encomenda..." autocomplete="off">
-      <div class="encomenda-fields">
-        <div class="encomenda-field-wrap">
-          <input type="number" class="encomenda-qty" placeholder="Qtd" min="0" inputmode="numeric">
-          <span class="encomenda-field-label">un.</span>
-        </div>
-        <div class="encomenda-field-wrap">
-          <input type="number" class="encomenda-amt" placeholder="0" min="0" inputmode="decimal">
-          <span class="encomenda-field-label">MT</span>
-        </div>
+      <div class="encomenda-top-row">
+        <input type="text" class="encomenda-nome big-input" placeholder="Nome da encomenda..." autocomplete="off">
         <button class="saida-remove-btn" onclick="App.removeEncomenda(${id})">✕</button>
+      </div>
+      <div class="encomenda-bottom-row">
+        <div class="encomenda-field">
+          <span class="encomenda-field-lbl">Quantidade</span>
+          <div class="encomenda-input-row">
+            <input type="number" class="encomenda-qty" placeholder="0" min="0" inputmode="numeric" oninput="App.calcVendasTotals()">
+            <span class="encomenda-unit">un.</span>
+          </div>
+        </div>
+        <div class="encomenda-field">
+          <span class="encomenda-field-lbl">Recebido</span>
+          <div class="encomenda-input-row">
+            <input type="number" class="encomenda-amt" placeholder="0" min="0" inputmode="decimal" oninput="App.calcVendasTotals()">
+            <span class="encomenda-unit">MT</span>
+          </div>
+        </div>
       </div>
     `;
     list.appendChild(item);
