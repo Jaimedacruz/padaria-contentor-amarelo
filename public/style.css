@@ -1964,10 +1964,19 @@ input[type="number"] {
   gap: 10px;
 }
 
+.stock-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .stock-card-name {
   font-size: 16px;
   font-weight: 800;
   color: var(--black);
+  flex: 1;
+  min-width: 0;
 }
 
 .stock-card-grid {
