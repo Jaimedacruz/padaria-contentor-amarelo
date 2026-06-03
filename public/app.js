@@ -168,6 +168,8 @@ const App = (() => {
 
   function _resetProdForm() {
     document.getElementById('prod-data').value = _today();
+    const c = document.getElementById('prod-comentario');
+    if (c) c.value = '';
   }
 
   // ─── Render product cards ──────────────────────────────────────
@@ -543,6 +545,8 @@ const App = (() => {
 
     const totalProduzido = items.reduce((s, x) => s + x.produzido, 0);
 
+    const comentario = (document.getElementById('prod-comentario')?.value || '').trim();
+
     const payload = {
       reportType:  'producao',
       workerName:  nome,
@@ -551,6 +555,7 @@ const App = (() => {
       date:        data,
       submittedAt: new Date().toISOString(),
       items,
+      comentario:  comentario || null,
       totals: { totalProduzido },
     };
 
@@ -1004,6 +1009,7 @@ const App = (() => {
             <div class="rec-header"><span class="rec-name">${_esc(nome)}</span><span class="rec-date">${r.date}</span></div>
             <div class="rec-items">${rows || '<span style="color:#bbb;font-size:13px">Sem entradas</span>'}</div>
             <div class="rec-footer"><span>Total: <strong>${r.totals?.totalProduzido||0} un.</strong></span></div>
+            ${r.comentario ? `<div class="rec-comentario">💬 ${_esc(r.comentario)}</div>` : ''}
           </div>`;
         }
 
