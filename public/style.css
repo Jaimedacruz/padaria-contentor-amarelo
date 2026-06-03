@@ -716,19 +716,37 @@ input[type="number"] {
 .encomenda-fields {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .encomenda-field-wrap {
   display: flex;
   align-items: center;
   gap: 4px;
-  flex: 1;
+  flex-shrink: 0;
 }
 
-.encomenda-qty,
-.encomenda-amt {
+.encomenda-field-wrap:nth-child(2) {
   flex: 1;
+  min-width: 0;
+}
+
+.encomenda-qty {
+  width: 62px;
+  padding: 10px 8px;
+  font-size: 15px;
+  font-weight: 800;
+  border: 2px solid var(--grey);
+  border-radius: var(--radius-sm);
+  background: var(--grey-light);
+  text-align: right;
+  color: var(--black);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.encomenda-amt {
+  width: 100%;
   min-width: 0;
   padding: 10px 8px;
   font-size: 15px;
