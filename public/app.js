@@ -20,6 +20,81 @@ const PRODUCTS = [
   { name: 'Pãezinhos de Leite',   price: 55 },
 ];
 
+const INGREDIENTS = {
+  'Pão Normal': [
+    { name: 'Farinha',  unit: 'kg', ref: '25' },
+    { name: 'Sal',      unit: 'g',  ref: '250' },
+    { name: 'Vitamina', unit: 'g',  ref: '40' },
+    { name: 'Fermento', unit: 'g',  ref: '100–150' },
+  ],
+  'Pão Especial': [
+    { name: 'Farinha',  unit: 'kg', ref: '25' },
+    { name: 'Sal',      unit: 'g',  ref: '250' },
+    { name: 'Vitamina', unit: 'g',  ref: '40' },
+    { name: 'Fermento', unit: 'g',  ref: '200–250' },
+    { name: 'Manteiga', unit: 'g',  ref: '250' },
+    { name: 'Açúcar',   unit: 'g',  ref: '100' },
+  ],
+  'Pão de Água': [
+    { name: 'Farinha',  unit: 'kg', ref: '15' },
+    { name: 'Sal',      unit: 'g',  ref: '150' },
+    { name: 'Vitamina', unit: 'g',  ref: '30' },
+    { name: 'Fermento', unit: 'g',  ref: '200–250' },
+  ],
+  'Pão de Forma': [
+    { name: 'Farinha',          unit: 'kg', ref: '2' },
+    { name: 'Ovos',             unit: 'un', ref: '3' },
+    { name: 'Açúcar',           unit: 'g',  ref: '100' },
+    { name: 'Vitamina',         unit: 'g',  ref: '10' },
+    { name: 'Manteiga',         unit: 'g',  ref: '100' },
+    { name: 'Leite',            unit: 'ml', ref: '250' },
+    { name: 'Fermento',         unit: 'g',  ref: '80–100' },
+  ],
+  'Biscoitos': [
+    { name: 'Farinha',          unit: 'kg',    ref: '3' },
+    { name: 'Açúcar',           unit: 'g',     ref: '750' },
+    { name: 'Maizena',          unit: 'g',     ref: '150' },
+    { name: 'Ovos',             unit: 'un',    ref: '12' },
+    { name: 'Fermento Royal',   unit: 'g',     ref: '120' },
+    { name: 'Leite Fresco',     unit: 'ml',    ref: '500' },
+    { name: 'Leite Condensado', unit: 'latas', ref: '1' },
+    { name: 'Manteiga',         unit: 'kg',    ref: '1' },
+  ],
+  'Broa': [
+    { name: 'Farinha de Milho',  unit: 'kg',       ref: '1' },
+    { name: 'Farinha de Trigo',  unit: 'g',        ref: '700' },
+    { name: 'Corante',           unit: 'colheres', ref: '1' },
+    { name: 'Açúcar',            unit: 'g',        ref: '100' },
+    { name: 'Farinha Integral',  unit: 'g',        ref: '100' },
+  ],
+  'Pãezinhos': [
+    { name: 'Farinha',  unit: 'kg', ref: '5' },
+    { name: 'Sal',      unit: 'g',  ref: '50' },
+    { name: 'Vitamina', unit: 'g',  ref: '15' },
+    { name: 'Fermento', unit: 'g',  ref: '80–100' },
+  ],
+  'Arrufada Unidade': [
+    { name: 'Farinha',  unit: 'kg',       ref: '2' },
+    { name: 'Açúcar',   unit: 'g',        ref: '350' },
+    { name: 'Corante',  unit: 'colheres', ref: '1' },
+    { name: 'Manteiga', unit: 'g',        ref: '100' },
+    { name: 'Canela',   unit: 'colheres', ref: '1' },
+    { name: 'Fermento', unit: 'g',        ref: '100' },
+  ],
+  'Arrufada Pacote': [
+    { name: 'Farinha',  unit: 'kg',       ref: '15' },
+    { name: 'Açúcar',   unit: 'kg',       ref: '1.8' },
+    { name: 'Corante',  unit: 'colheres', ref: '2' },
+    { name: 'Manteiga', unit: 'g',        ref: '250' },
+    { name: 'Fermento', unit: 'g',        ref: '150' },
+  ],
+  'Pãezinhos Integrais': [
+    { name: 'Farinha Integral', unit: 'kg', ref: '1' },
+    { name: 'Fermento',         unit: 'g',  ref: '100' },
+    { name: 'Vitamina',         unit: 'g',  ref: '10' },
+  ],
+};
+
 const App = (() => {
   let vendasShift   = 'Noite';
   let prodShift     = 'Noite';
@@ -169,11 +244,34 @@ const App = (() => {
             <button class="qty-btn" onclick="App.changeQty('p-prod-${i}',1,'calcProdTotals')">+</button>
           </div>
         </div>
+        ${_ingSection(p.name, i)}
       `;
       container.appendChild(card);
     });
 
     calcProdTotals();
+  }
+
+  function _ingSection(productName, pIdx) {
+    const ings = INGREDIENTS[productName];
+    if (!ings) return '';
+    const rows = ings.map((ing, j) => `
+      <div class="ing-row">
+        <div class="ing-label-wrap">
+          <span class="ing-label">${_esc(ing.name)}</span>
+          <span class="ing-hint">ref: ${ing.ref} ${_esc(ing.unit)}</span>
+        </div>
+        <div class="ing-input-wrap">
+          <input type="number" id="p-ing-${pIdx}-${j}" class="ing-input"
+                 placeholder="0" min="0" step="0.01" inputmode="decimal">
+          <span class="ing-unit">${_esc(ing.unit)}</span>
+        </div>
+      </div>
+    `).join('');
+    return `<div class="ing-section">
+      <div class="ing-section-title">🧂 Ingredientes Usados</div>
+      ${rows}
+    </div>`;
   }
 
   // ─── Qty helper ───────────────────────────────────────────────
@@ -427,11 +525,22 @@ const App = (() => {
     if (!nome) { showToast('⚠️ Preencha o nome do trabalhador'); return; }
     if (!data) { showToast('⚠️ Preencha a data'); return; }
 
-    const items = PRODUCTS.filter(p => !p.vendasOnly).map((p, i) => ({
-      produto:       p.name,
-      precoUnitario: p.price,
-      produzido:     _int(`p-prod-${i}`),
-    }));
+    const items = PRODUCTS.filter(p => !p.vendasOnly).map((p, i) => {
+      const ings = INGREDIENTS[p.name];
+      const ingredientes = ings
+        ? ings.map((ing, j) => ({
+            nome:       ing.name,
+            unidade:    ing.unit,
+            quantidade: parseFloat(document.getElementById(`p-ing-${i}-${j}`)?.value) || 0,
+          })).filter(x => x.quantidade > 0)
+        : [];
+      return {
+        produto:       p.name,
+        precoUnitario: p.price,
+        produzido:     _int(`p-prod-${i}`),
+        ...(ingredientes.length ? { ingredientes } : {}),
+      };
+    });
 
     const totalProduzido = items.reduce((s, x) => s + x.produzido, 0);
 
