@@ -6,18 +6,18 @@ const PRODUCTS = [
   { name: 'Pão de Água',          price: 10 },
   { name: 'Pão Especial',         price: 15 },
   { name: 'Pão de Forma',         price: 50 },
-  { name: 'Natas',                price: 50 },
-  { name: 'Palmeiras',            price: 40 },
-  { name: 'Palmeiras Mini',       price: 15 },
-  { name: 'Croissants',           price: 55 },
   { name: 'Biscoitos',            price: 10 },
   { name: 'Broa',                 price: 25 },
   { name: 'Pãezinhos',            price: 40 },
   { name: 'Arrufada Unidade',     price: 10 },
   { name: 'Arrufada Pacote',      price: 50 },
   { name: 'Pãezinhos Integrais',  price: 50 },
-  { name: 'Pão Ralado',           price: 50 },
   { name: 'Pãezinhos de Leite',   price: 55 },
+  { name: 'Natas',                price: 50 },
+  { name: 'Palmeiras',            price: 40 },
+  { name: 'Palmeiras Mini',       price: 15 },
+  { name: 'Croissants',           price: 55 },
+  { name: 'Pão Ralado',           price: 50 },
 ];
 
 const INGREDIENTS = {
