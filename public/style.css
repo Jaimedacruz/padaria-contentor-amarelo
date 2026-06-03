@@ -665,6 +665,97 @@ input[type="number"] {
   background: #EF9A9A;
 }
 
+/* ─── ENCOMENDAS SECTION ──────────────────────── */
+
+.encomendas-section {
+  padding: 14px 14px 0;
+}
+
+.encomendas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.add-encomenda-btn {
+  background: var(--yellow);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--black);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.add-encomenda-btn:active {
+  background: var(--yellow-dark);
+}
+
+.encomenda-item {
+  background: var(--white);
+  border: 1px solid var(--grey);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.encomenda-item .encomenda-nome {
+  font-size: 14px;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.encomenda-fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.encomenda-field-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.encomenda-qty,
+.encomenda-amt {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 8px;
+  font-size: 15px;
+  font-weight: 800;
+  border: 2px solid var(--grey);
+  border-radius: var(--radius-sm);
+  background: var(--grey-light);
+  text-align: right;
+  color: var(--black);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.encomenda-qty:focus,
+.encomenda-amt:focus {
+  outline: none;
+  border-color: var(--yellow);
+  background: var(--white);
+}
+
+.encomenda-field-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #999;
+  flex-shrink: 0;
+}
+
 /* ─── TOTALS PANEL ────────────────────────────── */
 
 .totals-panel {

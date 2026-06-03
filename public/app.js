@@ -160,6 +160,9 @@ const App = (() => {
     _saidaCount = 0;
     const saidasList = document.getElementById('saidas-list');
     if (saidasList) saidasList.innerHTML = '';
+    _encCount = 0;
+    const encList = document.getElementById('encomendas-list');
+    if (encList) encList.innerHTML = '';
     const banner = document.getElementById('status-banner');
     if (banner) { banner.textContent = ''; banner.className = 'status-banner'; }
     const diffEl = document.getElementById('tot-diferenca');
@@ -398,17 +401,23 @@ const App = (() => {
       valor:     Math.max(0, parseFloat(item.querySelector('.saida-amt')?.value) || 0),
     })).filter(s => s.valor > 0);
     const totalSaidas      = saidasItems.reduce((s, x) => s + x.valor, 0);
+    const encomendasItems  = Array.from(document.querySelectorAll('.encomenda-item')).map(item => ({
+      nome:       item.querySelector('.encomenda-nome')?.value.trim() || '',
+      quantidade: Math.max(0, parseInt(item.querySelector('.encomenda-qty')?.value)   || 0),
+      recebido:   Math.max(0, parseFloat(item.querySelector('.encomenda-amt')?.value) || 0),
+    })).filter(e => e.nome || e.quantidade || e.recebido);
+    const totalEncomendas  = encomendasItems.reduce((s, x) => s + x.recebido, 0);
     const netEntregar      = Math.max(0, totalGeral - totalSaidas);
     const dinheiroRecebido = _float('dinheiro-recebido');
     return {
       reportType: 'vendas', sellerName: nome, branch: 'Padaria Principal',
       shift: 'Noite+Manhã', date: data, submittedAt: new Date().toISOString(),
-      items, comentario: comentario || null, saidas: saidasItems,
+      items, comentario: comentario || null, saidas: saidasItems, encomendas: encomendasItems,
       totals: {
         totalUnidsNoite: items.reduce((s, x) => s + x.noite.vendido, 0),
         totalUnidsManha: items.reduce((s, x) => s + x.manha.vendido, 0),
         totalNoite, totalManha, totalEsperado: totalGeral,
-        totalSaidas, netEntregar, dinheiroRecebido,
+        totalSaidas, totalEncomendas, netEntregar, dinheiroRecebido,
         dinheiroDepositado: _float('dinheiro-depositado'),
         dinheiroCofre:      _float('dinheiro-cofre'),
         diferenca:          dinheiroRecebido - netEntregar,
@@ -472,6 +481,16 @@ const App = (() => {
         <div class="conf-card-title">💸 Saídas</div>
         ${p.saidas.map(s => `<div class="conf-row"><span>${_esc(s.descricao)||'—'}</span><strong>${s.valor} MT</strong></div>`).join('')}
         <div class="conf-row conf-subtotal"><span>Total Saídas</span><strong>${t.totalSaidas} MT</strong></div>
+      </div>` : ''}
+      ${p.encomendas?.length ? `
+      <div class="conf-card">
+        <div class="conf-card-title">📦 Encomendas</div>
+        ${p.encomendas.map(e => `
+          <div class="conf-row">
+            <span>${_esc(e.nome)||'—'} ${e.quantidade ? `<span style="color:#888;font-size:13px">(${e.quantidade} un.)</span>` : ''}</span>
+            <strong>${e.recebido} MT</strong>
+          </div>`).join('')}
+        <div class="conf-row conf-subtotal"><span>Total Encomendas</span><strong>${t.totalEncomendas} MT</strong></div>
       </div>` : ''}
       <div class="conf-card">
         <div class="conf-card-title">💰 Financeiro</div>
@@ -620,6 +639,40 @@ const App = (() => {
     const el = document.getElementById(`saida-${id}`);
     if (el) el.remove();
     calcVendasTotals();
+  }
+
+  // ─── Encomendas ───────────────────────────────────────────────
+
+  let _encCount = 0;
+
+  function addEncomenda() {
+    _encCount++;
+    const id   = _encCount;
+    const list = document.getElementById('encomendas-list');
+    const item = document.createElement('div');
+    item.className = 'encomenda-item';
+    item.id = `encomenda-${id}`;
+    item.innerHTML = `
+      <input type="text" class="encomenda-nome big-input" placeholder="Nome da encomenda..." autocomplete="off">
+      <div class="encomenda-fields">
+        <div class="encomenda-field-wrap">
+          <input type="number" class="encomenda-qty" placeholder="Qtd" min="0" inputmode="numeric">
+          <span class="encomenda-field-label">un.</span>
+        </div>
+        <div class="encomenda-field-wrap">
+          <input type="number" class="encomenda-amt" placeholder="0" min="0" inputmode="decimal">
+          <span class="encomenda-field-label">MT</span>
+        </div>
+        <button class="saida-remove-btn" onclick="App.removeEncomenda(${id})">✕</button>
+      </div>
+    `;
+    list.appendChild(item);
+    item.querySelector('.encomenda-nome').focus();
+  }
+
+  function removeEncomenda(id) {
+    const el = document.getElementById(`encomenda-${id}`);
+    if (el) el.remove();
   }
 
   // ─── Fecho de Caixa ──────────────────────────────────────────
@@ -1045,6 +1098,11 @@ const App = (() => {
           <div class="rec-saidas-title">💸 Saídas</div>
           ${saidas.map(s => `<div class="rec-item"><span>${_esc(s.descricao)||'—'}</span><span class="rec-vals" style="color:var(--red)">${s.valor} MT</span></div>`).join('')}
         ` : '';
+        const encomendas = r.encomendas || [];
+        const encomendasHtml = encomendas.length ? `
+          <div class="rec-saidas-title">📦 Encomendas</div>
+          ${encomendas.map(e => `<div class="rec-item"><span>${_esc(e.nome)||'—'} ${e.quantidade ? `<span style="color:#888;font-size:12px">(${e.quantidade} un.)</span>` : ''}</span><span class="rec-vals">${e.recebido} MT</span></div>`).join('')}
+        ` : '';
 
         const t    = r.totals || {};
         const diff = t.diferenca || 0;
@@ -1060,6 +1118,7 @@ const App = (() => {
           <div class="rec-items">
             ${itemRows || '<span style="color:#bbb;font-size:13px">Sem entradas</span>'}
             ${saidasHtml}
+            ${encomendasHtml}
           </div>
           <div class="rec-financials">
             <div class="rec-fin-row"><span>Total Geral</span><span>${t.totalEsperado||0} MT</span></div>
@@ -1199,6 +1258,8 @@ const App = (() => {
     showToast,
     addSaida,
     removeSaida,
+    addEncomenda,
+    removeEncomenda,
     showConfirm,
     confirmAndSubmit,
     backToVendas,
