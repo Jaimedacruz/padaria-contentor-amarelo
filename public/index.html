@@ -20,8 +20,8 @@
       <h1 class="pin-title">Padaria<br>Contentor Amarelo</h1>
       <p class="pin-subtitle">Introduza o PIN para aceder</p>
       <input type="password" id="pin-input" class="pin-input"
-             inputmode="numeric" pattern="[0-9]*" maxlength="8"
-             placeholder="••••" autocomplete="off"
+             inputmode="text" maxlength="12"
+             placeholder="••••••" autocomplete="off"
              onkeydown="if(event.key==='Enter')App.verifyPin()">
       <div id="pin-error" class="pin-error"></div>
       <button class="pin-btn" onclick="App.verifyPin()">Entrar →</button>
