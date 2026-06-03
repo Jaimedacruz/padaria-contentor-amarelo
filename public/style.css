@@ -1947,56 +1947,75 @@ input[type="number"] {
   color: var(--grey-mid);
 }
 
-.stock-list {
+.stock-cards {
   margin: 0 14px;
-  border: 1px solid var(--grey);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--white);
-}
-
-.stock-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--grey-light);
-}
-
-.stock-row:last-child {
-  border-bottom: none;
-}
-
-.stock-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  gap: 10px;
 }
 
-.stock-name {
-  font-size: 15px;
-  font-weight: 700;
+.stock-card {
+  background: var(--white);
+  border: 1px solid var(--grey);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stock-card-name {
+  font-size: 16px;
+  font-weight: 800;
   color: var(--black);
 }
 
-.stock-used {
-  font-size: 12px;
-  color: var(--grey-mid);
+.stock-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  min-width: 0;
+}
+
+.stock-card-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.stock-card-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.stock-card-used {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--black);
+}
+
+.stock-card-unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: #999;
 }
 
 .stock-input-wrap {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
+  min-width: 0;
 }
 
 .stock-qty-input {
-  width: 80px;
+  flex: 1;
+  min-width: 0;
   padding: 10px 8px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
   border: 2px solid var(--grey);
   border-radius: var(--radius-sm);
@@ -2017,7 +2036,37 @@ input[type="number"] {
   font-size: 13px;
   font-weight: 800;
   color: #999;
-  min-width: 28px;
+  flex-shrink: 0;
+}
+
+.stock-saldo {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.stock-saldo--pos  { background: #E8F5E9; color: #2E7D32; }
+.stock-saldo--neg  { background: #FFEBEE; color: #C62828; }
+.stock-saldo--zero { background: #E3F2FD; color: #1565C0; }
+.stock-saldo--none { background: var(--grey-light); color: var(--grey-mid); font-weight: 500; }
+
+.stock-notes-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--grey);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--black);
+  background: var(--grey-light);
+  font-family: inherit;
+}
+
+.stock-notes-input:focus {
+  outline: none;
+  border-color: var(--yellow);
+  background: var(--white);
 }
 
 .stock-custom-section {

@@ -1267,7 +1267,6 @@ const App = (() => {
     const reports = _loadLocal();
     const prod    = reports.filter(r => r.reportType === 'producao');
 
-    // aggregate ingredient usage from production records
     const usedMap = {};
     prod.forEach(r => {
       (r.items || []).forEach(item => {
@@ -1289,24 +1288,45 @@ const App = (() => {
 
     container.innerHTML = `
       <div class="stock-meta">🕐 Última atualização: <strong>${lastSavedStr}</strong></div>
-      <div class="stock-list">
+      <div class="stock-cards">
         ${items.map(item => {
           const saved = stock[item.key];
           const qty   = saved?.qty != null ? saved.qty : '';
+          const notes = saved?.notes ? _esc(saved.notes) : '';
           const used  = usedMap[item.key] || 0;
+          const saldo = qty !== '' ? parseFloat(qty) - used : null;
+          const saldoHtml = saldo === null
+            ? `<div class="stock-saldo stock-saldo--none">Insira o stock para ver o saldo</div>`
+            : saldo > 0
+            ? `<div class="stock-saldo stock-saldo--pos">✅ +${_fmt(saldo)} ${_esc(item.unit)} disponível</div>`
+            : saldo < 0
+            ? `<div class="stock-saldo stock-saldo--neg">⚠️ ${_fmt(Math.abs(saldo))} ${_esc(item.unit)} em falta</div>`
+            : `<div class="stock-saldo stock-saldo--zero">✅ Stock equilibrado</div>`;
           return `
-            <div class="stock-row">
-              <div class="stock-info">
-                <span class="stock-name">${_esc(item.name)}</span>
-                ${used > 0 ? `<span class="stock-used">Usado: ${_fmt(used)} ${_esc(item.unit)}</span>` : ''}
+            <div class="stock-card">
+              <div class="stock-card-name">${_esc(item.name)}</div>
+              <div class="stock-card-grid">
+                <div class="stock-card-cell">
+                  <span class="stock-card-lbl">Usado (registos)</span>
+                  <span class="stock-card-used">${used > 0 ? _fmt(used) : '—'} <span class="stock-card-unit">${_esc(item.unit)}</span></span>
+                </div>
+                <div class="stock-card-cell">
+                  <span class="stock-card-lbl">Em Stock</span>
+                  <div class="stock-input-wrap">
+                    <input type="number" class="stock-qty-input"
+                           data-key="${_esc(item.key)}"
+                           value="${qty}" placeholder="0"
+                           min="0" step="0.01" inputmode="decimal"
+                           oninput="App.calcStockSaldo(this,${used},'${_esc(item.unit)}')">
+                    <span class="stock-unit">${_esc(item.unit)}</span>
+                  </div>
+                </div>
               </div>
-              <div class="stock-input-wrap">
-                <input type="number" class="stock-qty-input"
-                       data-key="${_esc(item.key)}"
-                       value="${qty}" placeholder="0"
-                       min="0" step="0.01" inputmode="decimal">
-                <span class="stock-unit">${_esc(item.unit)}</span>
-              </div>
+              ${saldoHtml}
+              <input type="text" class="stock-notes-input"
+                     data-notes-key="${_esc(item.key)}"
+                     value="${notes}"
+                     placeholder="📝 Notas...">
             </div>`;
         }).join('')}
       </div>
@@ -1322,31 +1342,55 @@ const App = (() => {
       <button class="stock-save-btn" onclick="App.saveStock()">💾 Guardar Stock</button>
     `;
 
-    // populate saved custom items
     const customList  = document.getElementById('custom-stock-list');
     const savedCustom = _loadCustomStock();
     savedCustom.forEach(item => _appendCustomRow(customList, item));
+  }
+
+  function calcStockSaldo(inputEl, used, unit) {
+    const qty    = parseFloat(inputEl.value);
+    const saldoEl = inputEl.closest('.stock-card')?.querySelector('.stock-saldo');
+    if (!saldoEl) return;
+    if (isNaN(qty)) {
+      saldoEl.className = 'stock-saldo stock-saldo--none';
+      saldoEl.textContent = 'Insira o stock para ver o saldo';
+      return;
+    }
+    const saldo = qty - used;
+    const abs   = _fmt(Math.abs(saldo));
+    if (saldo > 0) {
+      saldoEl.className = 'stock-saldo stock-saldo--pos';
+      saldoEl.textContent = `✅ +${abs} ${unit} disponível`;
+    } else if (saldo < 0) {
+      saldoEl.className = 'stock-saldo stock-saldo--neg';
+      saldoEl.textContent = `⚠️ ${abs} ${unit} em falta`;
+    } else {
+      saldoEl.className = 'stock-saldo stock-saldo--zero';
+      saldoEl.textContent = `✅ Stock equilibrado`;
+    }
   }
 
   function saveStock() {
     const existing = _loadStock();
     const now = new Date().toISOString();
 
-    // predefined items
+    // predefined items (qty + notes)
     document.querySelectorAll('.stock-qty-input[data-key]').forEach(input => {
-      const key = input.dataset.key;
-      const val = parseFloat(input.value);
-      if (key) existing[key] = { qty: isNaN(val) ? null : val, savedAt: now };
+      const key   = input.dataset.key;
+      const val   = parseFloat(input.value);
+      const notes = document.querySelector(`.stock-notes-input[data-notes-key="${CSS.escape(key)}"]`)?.value.trim() || '';
+      if (key) existing[key] = { qty: isNaN(val) ? null : val, notes: notes || null, savedAt: now };
     });
     _saveStockData(existing);
 
     // custom items
     const customItems = [];
     document.querySelectorAll('#custom-stock-list .custom-stock-row').forEach(row => {
-      const name = row.querySelector('.custom-stock-name')?.value.trim() || '';
-      const unit = row.querySelector('.custom-stock-unit')?.value.trim() || '';
-      const val  = parseFloat(row.querySelector('.custom-stock-qty')?.value);
-      if (name) customItems.push({ name, unit, qty: isNaN(val) ? null : val, savedAt: now });
+      const name  = row.querySelector('.custom-stock-name')?.value.trim() || '';
+      const unit  = row.querySelector('.custom-stock-unit')?.value.trim() || '';
+      const notes = row.querySelector('.custom-stock-notes')?.value.trim() || '';
+      const val   = parseFloat(row.querySelector('.custom-stock-qty')?.value);
+      if (name) customItems.push({ name, unit, qty: isNaN(val) ? null : val, notes: notes || null, savedAt: now });
     });
     _saveCustomStock(customItems);
 
@@ -1397,7 +1441,11 @@ const App = (() => {
                    value="${_esc(item.unit || '')}">
           </div>
         </div>
-      </div>`;
+      </div>
+      <input type="text" class="stock-notes-input custom-stock-notes"
+             placeholder="📝 Notas..."
+             value="${_esc(item.notes || '')}">
+    `;
     container.appendChild(row);
   }
 
@@ -1499,6 +1547,7 @@ const App = (() => {
     togglePinVisibility,
     switchAdminTab,
     saveStock,
+    calcStockSaldo,
     addCustomStock,
     removeCustomStock,
     logout,
